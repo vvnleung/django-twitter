@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from accounts.api.serializers import (
     UserSerializer,
     LoginSerializer,
+    SignupSerializer,
 )
 from django.contrib.auth import (
     login as django_login,
@@ -22,7 +23,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 class AccountViewSet(viewsets.ViewSet):
-    serializer_class = LoginSerializer
+    serializer_class = SignupSerializer
 
     @action(methods=['GET'], detail=False)
     def login_status(self, request):
@@ -66,3 +67,19 @@ class AccountViewSet(viewsets.ViewSet):
             "success": True,
             "user": UserSerializer(user).data,
         })
+
+    @action(methods=['POST'], detail=False)
+    def signup(self, request):
+        serializer = SignupSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({
+                "success": False,
+                "message": "Please check input",
+                "errors": serializer.errors,
+            }, status=400)
+        user = serializer.save()
+        django_login(request, user)
+        return Response({
+            "success": True,
+            "user": UserSerializer(user).data,
+        }, status=201)
