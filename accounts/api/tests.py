@@ -29,7 +29,7 @@ class AccountApiTests(TestCase):
         # 登陆失败，http status code 返回 405 = METHOD_NOT_ALLOWED
         self.assertEqual(response.status_code, 405)
 
-        # 用了 post 但是密码错了
+        # 用了 cbfg 但是密码错了
         response = self.client.post(LOGIN_URL, {
             'username': self.user.username,
             'password': 'wrong password',
